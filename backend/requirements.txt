@@ -93,7 +93,7 @@ Pygments==2.18.0
 PyGObject==3.42.1
 PyJWT==2.3.0
 pyparsing==2.4.7
-python-apt==2.4.0+ubuntu2
+#python-apt==2.4.0+ubuntu2
 python-dateutil==2.9.0.post0
 python-dotenv==1.0.1
 python-magic==0.4.24
