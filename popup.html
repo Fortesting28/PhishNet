@@ -3,21 +3,108 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PhishNet</title>
-  <link rel="stylesheet" href="popup.css">
+  <title>PhishNet - Email Security Scanner</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      width: 400px;
+      padding: 15px;
+      margin: 0;
+      background-color: #f5f5f5;
+      color: #333;
+    }
+    #app {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    h1 {
+      color: #1a73e8;
+      margin: 0 0 15px 0;
+      text-align: center;
+      font-size: 24px;
+    }
+    button {
+      background-color: #1a73e8;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: background-color 0.2s;
+    }
+    button:hover {
+      background-color: #1765cc;
+    }
+    button:disabled {
+      background-color: #cccccc;
+      cursor: not-allowed;
+    }
+    #status {
+      padding: 10px;
+      border-radius: 4px;
+      background-color: #f8f9fa;
+      text-align: center;
+      font-size: 14px;
+    }
+    #results {
+      max-height: 300px;
+      overflow-y: auto;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      padding: 10px;
+      background-color: white;
+    }
+    .result-item {
+      padding: 8px 0;
+      border-bottom: 1px solid #eee;
+    }
+    .result-item:last-child {
+      border-bottom: none;
+    }
+    .result-item.phishing {
+      border-left: 3px solid #d93025;
+      padding-left: 8px;
+    }
+    .result-item.safe {
+      border-left: 3px solid #0b8043;
+      padding-left: 8px;
+    }
+    .status-badge {
+      float: right;
+      font-weight: bold;
+    }
+    .error {
+      color: #d93025;
+      font-size: 12px;
+      margin-top: 4px;
+    }
+    #new-user-link {
+      display: block;
+      text-align: center;
+      color: #1a73e8;
+      text-decoration: none;
+      margin: 10px 0;
+      font-size: 14px;
+    }
+    #new-user-link:hover {
+      text-decoration: underline;
+    }
+  </style>
 </head>
 <body>
   <div id="app">
-    <h1>PhishNet</h1>
+    <h1>PhishNet Scanner</h1>
     <button id="connect-btn">Connect Gmail Account</button>
+    <a href="mfa/index.html" id="new-user-link">New Users: Sign in here</a>
     <button id="scan-btn" disabled>Scan Inbox</button>
-    <div id="status"></div>
+    <div id="status">Ready to connect</div>
     <div id="results"></div>
-    <button id="download-pdf-btn" disabled>Download PDF</button>
+    <button id="download-pdf-btn" disabled>Download PDF Report</button>
   </div>
 
-  <!-- Include jsPDF locally -->
-  <script src="libs/jspdf.umd.min.js"></script>
-  <script src="popup.js"></script>
+  <script src="./libs/jspdf.umd.min.js"></script>
+  <script src="./popup.js"></script>
 </body>
 </html>

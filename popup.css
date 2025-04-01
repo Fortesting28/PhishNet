@@ -23,3 +23,13 @@ button {
   margin-top: 20px;
   text-align: left;
 }
+
+#new-user-link {
+    display: block;
+    text-align: center;
+    font-size: 12px;
+    text-decoration: underline;
+    color: blue;
+    margin-top: 5px;
+    cursor: pointer;
+}

@@ -8,11 +8,12 @@
     "identity.email",
     "storage",
     "activeTab",
+    "tabs",
     "scripting"
   ],
   "host_permissions": [
     "https://mail.google.com/*",
-    "https://www.googleapis.com/*"
+    "https://www.googleapis.com/gmail/v1/users/*"
   ],
   "oauth2": {
     "client_id": "142162449253-05ka7aiclen157qqtie1m1mc4fgnvpkj.apps.googleusercontent.com",
@@ -32,24 +33,20 @@
     {
       "matches": ["https://mail.google.com/*"],
       "js": ["content.js"],
-      "run_at": "document_idle",
-      "all_frames": true
+      "run_at": "document_idle"
     }
   ],
   "background": {
-    "service_worker": "background.js"
-  },
-  "externally_connectable": {
-    "matches": ["https://mail.google.com/*"]
+    "service_worker": "background.js",
+    "type": "module"
   },
   "web_accessible_resources": [
     {
-      "resources": ["images/*.png", "images/*.svg", "images/*.gif"],
-      "matches": ["https://mail.google.com/*"],
-      "use_dynamic_url": false
+      "resources": ["images/*.png", "images/*.svg", "images/*.gif", "sign-up.html"],
+      "matches": ["https://mail.google.com/*"]
     }
   ],
   "content_security_policy": {
-    "extension_pages": "script-src 'self'; object-src 'self'"
+    "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'self'"
   }
 }

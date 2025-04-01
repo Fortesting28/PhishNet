@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Success</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f8ff;
+            text-align: center;
+        }
+        h1 {
+            color: #4caf50;
+        }
+        p {
+            font-size: 1.2em;
+        }
+    </style>
+</head>
+<body>
+    <div id="content">
+        <h1 id="message">Success!</h1>
+        <p id="details"></p>
+    </div>
+    <script>
+        const params = new URLSearchParams(window.location.search);
+        const action = params.get("action");
+        const name = params.get("name");
+        const email = params.get("email");
+        const phone = params.get("phone");
+
+        const messageEl = document.getElementById("message");
+        const detailsEl = document.getElementById("details");
+
+        if (action === "signup") {
+            messageEl.textContent = "Welcome to PhishNet!";
+            detailsEl.innerHTML = `
+                <strong>Sign-Up Details:</strong><br>
+                Name: ${name}<br>
+                Email: ${email}<br>
+                ${phone ? `Phone: ${phone}` : ""}
+            `;
+        } else if (action === "forgot_password") {
+            messageEl.textContent = "Password Reset Request Submitted!";
+            detailsEl.innerHTML = `
+                <strong>Details Provided:</strong><br>
+                Email: ${email}<br>
+                ${phone ? `Phone: ${phone}` : ""}
+            `;
+        } else if (action === "login") {
+            messageEl.textContent = "Welcome Back!";
+            detailsEl.innerHTML = `
+                <strong>Logged In As:</strong><br>
+                Email: ${email}
+            `;
+        } else {
+            messageEl.textContent = "Success!";
+        }
+    </script>
+</body>
+</html>
