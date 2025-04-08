@@ -22,12 +22,14 @@ body {
 }
 
 .logo-typeface {
-  height: 32px;
+  height: 70px;
+  width: auto;
   margin-bottom: 5px;
 }
 
 .logo-icon {
-  height: 16px;
+  height: 85px;
+  width: auto;
 }
 
 h1 {
@@ -39,7 +41,7 @@ h1 {
 }
 
 button {
-  background-color: #1a73e8;
+  background-color: #0f3c8d;
   color: white;
   border: none;
   padding: 10px 15px;
