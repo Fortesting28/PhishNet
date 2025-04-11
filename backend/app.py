@@ -9,7 +9,7 @@ app = Flask(__name__)
 load_dotenv()
 CORS(app)
 
-DEEPSEEK_API_URL = "https://machinemodel.onrender.com/api/generate"
+DEEPSEEK_API_URL = "https://machinemodel.onrender.com"
 
 #http://localhost:11434/api/generate"
 
