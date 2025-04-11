@@ -9,9 +9,7 @@ app = Flask(__name__)
 load_dotenv()
 CORS(app)
 
-DEEPSEEK_API_URL = "https://machinemodel.onrender.com/"
-
-#http://localhost:11434/api/generate
+DEEPSEEK_API_URL = "http://localhost:11434/api/generate"
 
 #detection Rules
 PHISHING_KEYWORDS = [
