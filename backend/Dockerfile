@@ -1,16 +1,16 @@
 FROM ubuntu:22.04
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
-    curl ca-certificates && \
+    python3 \
+    python3-pip \
+    curl && \
     rm -rf /var/lib/apt/lists/*
+RUN ln -s /usr/bin/python3 /usr/bin/python
 RUN curl -fsSL https://ollama.com/install.sh | sh
-RUN ollama pull tinyllama
-EXPOSE 11434
-ENV OLLAMA_HOST=0.0.0.0
-HEALTHCHECK --interval=30s --timeout=10s \
-    CMD curl -f http://localhost:11434/api/tags || exit 1
-RUN useradd -m ollama && \
-    chown -R ollama:ollama /usr/local/bin/ollama
-USER ollama
-WORKDIR /home/ollama
-CMD ["ollama", "serve"]
+WORKDIR /app
+COPY . .
+RUN pip install -r requirements.txt
+RUN ollama pull deepseek-coder:1.5b-instruct
+ENV PORT 5000
+EXPOSE $PORT
+CMD sh -c "ollama serve & sleep 10 && python3 app.py"
