@@ -7,6 +7,7 @@ const statusEl = document.getElementById("status");
 const resultsEl = document.getElementById("results");
 const downloadBtn = document.getElementById("download-pdf-btn");
 const newUserLink = document.getElementById("new-user-link");
+const feedbackBtn = document.getElementById("feedback-btn");
 
 document.addEventListener("DOMContentLoaded", () => {
   chrome.identity.getAuthToken({ interactive: false }, (existingToken) => {
@@ -19,6 +20,12 @@ document.addEventListener("DOMContentLoaded", () => {
   connectBtn.addEventListener("click", connectGmail);
   scanBtn.addEventListener("click", scanInbox);
   downloadBtn.addEventListener("click", downloadPDF);
+
+  if (feedbackBtn) {
+    feedbackBtn.addEventListener("click", () => {
+      chrome.tabs.create({ url: chrome.runtime.getURL("feedback.html") });
+    });
+  }
 });
 
 function connectGmail() {
@@ -54,8 +61,15 @@ async function scanInbox() {
     }
 
     const results = await analyzeMessages(messages);
+    console.log(results);
+
     displayResults(results);
     statusEl.textContent = `Scan complete! Found ${results.length} messages.`;
+
+    const phishingEmails = results.filter(email => email.status === "Phishing");
+    localStorage.setItem('phishingEmails', JSON.stringify(phishingEmails));    
+    feedbackBtn.disabled = phishingEmails.length === 0;
+
   } catch (error) {
     console.error("Scan failed:", error);
     statusEl.textContent = "Scan failed. Please try again.";
@@ -110,7 +124,7 @@ async function analyzeMessages(messages) {
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
       
       const result = await response.json();
-      results.push({ subject, content, status: result.result });
+      results.push({ subject, content, status: result.result, reasons: result.reasons });
     } catch (error) {
       console.error(`Failed to analyze message ${index}:`, error);
       results.push({ 
@@ -144,6 +158,15 @@ function displayResults(results) {
       ${result.error ? `<div class="error">${escapeHtml(result.error)}</div>` : ""}
     </div>
   `).join("");
+
+  setTimeout(() => {
+    if (feedbackBtn) {
+      feedbackBtn.disabled = false; // Enable the feedback button
+      feedbackBtn.classList.remove("disabled"); // Remove any visual disabled class if there is one
+      feedbackBtn.offsetHeight;  // Force reflow
+      console.log('Feedback button enabled');
+    }
+  }, 0);
 
   downloadBtn.disabled = false;
 }
