@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "Testing28",
-  "version": "1.0",
-  "description": "StillTestin",
+  "name": "PhishNet",
+  "version": "2.1.0",
+  "description": "Comprehensive phishing detection tool for Gmail.",
   "permissions": [
     "identity",
     "identity.email",
