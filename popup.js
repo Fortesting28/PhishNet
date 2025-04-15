@@ -115,7 +115,7 @@ async function analyzeMessages(messages) {
       
       statusEl.textContent = `Analyzing ${index + 1}/${messages.length}: ${subject.substring(0, 30)}...`;
 
-      const response = await fetch("http://localhost:5000/analyze", {
+      const response = await fetch("https://phishnet-6beu.onrender.com/analyze", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ subject, content })
