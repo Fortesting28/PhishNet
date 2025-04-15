@@ -117,6 +117,11 @@ def analyze_email_with_deepseek(subject, content):
         print(f"DeepSeek API error: {e}")
         return "Error", "Low", ["API request failed"]
 
+@app.route('/')
+def health_check():
+    return jsonify(status="OK"), 200
+
+
 @app.route('/analyze', methods=['POST'])
 def analyze_email():
     data = request.json
@@ -164,4 +169,5 @@ def analyze_email():
             })
 
 if __name__ == '__main__':
+    port = int(os.environ.get("PORT", 5000))
     app.run(host='0.0.0.0', port=5000, debug=True)
