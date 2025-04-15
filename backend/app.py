@@ -9,9 +9,8 @@ app = Flask(__name__)
 load_dotenv()
 CORS(app)
 
-DEEPSEEK_API_URL = "https://b867-34-13-133-141.ngrok-free.app/api/generate"
-
-#http://localhost:11434/api/generate"
+TEST_URL = "https://b867-34-13-133-141.ngrok-free.app/api/generate"
+OLLAMA_API_URL = TEST_URL if "ngrok" in TEST_URL else "http://localhost:11434/api/generate"
 
 #detection Rules
 PHISHING_KEYWORDS = [
