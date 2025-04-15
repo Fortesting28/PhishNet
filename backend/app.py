@@ -9,7 +9,7 @@ app = Flask(__name__)
 load_dotenv()
 CORS(app)
 
-DEEPSEEK_API_URL = "https://b867-34-13-133-141.ngrok-free.app"
+DEEPSEEK_API_URL = "https://b867-34-13-133-141.ngrok-free.app/api/generate"
 
 #http://localhost:11434/api/generate"
 
