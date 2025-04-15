@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PhishNet Login</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" href="phishnet_logo.png" type="image/x-icon">
+</head>
+
+<body>
+    <div class="container">
+        <div class="form-box">
+            <h1 id="title">Sign Up</h1>
+
+            <form id="signupForm" class="form">
+                <div class="input-group">
+                    <div class="input-field">
+                        <input type="text" id="signupName" name="signupName" placeholder="Name*" required>
+                    </div>
+                    <div class="input-field">
+                        <input type="email" id="signupEmail" name="signupEmail" placeholder="Email*" required>
+                    </div>
+                    <div class="input-field">
+                        <input type="tel" id="signupPhone" name="signupPhone" placeholder="Phone">
+                        <button type="button" id="sendOtpBtn" class="action-btn">Send OTP</button>
+                    </div>
+                    <div class="input-field" id="otpField" style="display: none;">
+                        <input type="text" id="otpCode" name="otpCode" placeholder="Enter OTP*">
+                    </div>
+
+                    <div class="input-field">
+                        <input type="password" id="signupPassword" name="signupPassword" placeholder="Password*" required>
+                    </div>
+
+                    <div class="input-field">
+                        <label>
+                            <input type="checkbox" id="optInCheckbox" required> I agree to receive SMS/text messages from 844-405-7912. Reply STOP to opt-out, HELP for help.
+                        </label>
+                    </div>                
+                </div>
+                
+                <button type="submit" id="signupSubmit" class="action-btn" disabled>Sign Up</button>
+            </form>
+
+            <form id="loginForm" class="form" style="display: none;">
+                <div class="input-group">
+                    <div class="input-field">
+                        <input type="email" id="loginEmail" name="loginEmail" placeholder="Email*" required>
+                    </div>
+                    <div class="input-field">
+                        <input type="password" id="loginPassword" name="loginPassword" placeholder="Password*" required>
+                    </div>
+                </div>
+                <p>
+                    Forgot Password? <a href="#" id="forgotPasswordLink">Click Here</a>
+                </p>
+                <button type="submit" id="loginSubmit" class="action-btn">Log In</button>
+            </form>
+
+            <button type="button" id="toggleModeBtn" class="action-btn">Switch to Log In</button>
+        </div>
+    </div>
+
+    <div id="forgotPasswordModal" class="modal">
+        <div class="modal-content">
+            <span id="closeModal" class="close">&times;</span>
+            <h2>Forgot Password</h2>
+            <form id="forgotPasswordForm">
+                <div class="input-field">
+                    <input type="email" id="modalEmail" name="modalEmail" placeholder="Email*" required>
+                </div>
+                <div class="input-field">
+                    <input type="tel" id="modalPhone" name="modalPhone" placeholder="Phone">
+                </div>
+                <button type="submit" id="submitForgotPassword" class="action-btn">Submit</button>
+            </form>
+        </div>
+    </div>
+
+   <!-- <script>
+        document.getElementById('optInCheckbox').addEventListener('change', function () {
+            document.getElementById('signupSubmit').disabled = !this.checked;
+        });
+    </script> -->
+    
+    <script src="dist/bundle.js"></script>
+   <!-- <script src="firebase-config.js"></script> -->
+</body>
+
+</html>

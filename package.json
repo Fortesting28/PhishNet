@@ -1,0 +1,34 @@
+{
+  "dependencies": {
+    "body-parser": "^1.20.3",
+    "cors": "^2.8.5",
+    "express": "^4.21.2",
+    "twilio": "^5.4.0"
+  },
+  "name": "phishnet",
+  "version": "1.0.0",
+  "description": "<p align=\"center\">   <img width=\"570\" alt=\"Screen Shot 2025-03-24 at 2 04 29 PM\" src=\"https://github.com/user-attachments/assets/39ea2c94-5517-4399-991a-60052e9cd0af\" /> </p>",
+  "main": "background.js",
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "jest-environment-jsdom": "^29.7.0",
+    "jsdom": "^26.0.0"
+  },
+  "scripts": {
+    "test": "jest"
+  },
+  "jest": {
+    "testEnvironment": "jsdom"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Fortesting28/PhishNet.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Fortesting28/PhishNet/issues"
+  },
+  "homepage": "https://github.com/Fortesting28/PhishNet#readme"
+}

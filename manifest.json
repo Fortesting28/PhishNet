@@ -1,0 +1,52 @@
+{
+  "manifest_version": 3,
+  "name": "PhishNet",
+  "version": "2.1.0",
+  "description": "Comprehensive phishing detection tool for Gmail.",
+  "permissions": [
+    "identity",
+    "identity.email",
+    "storage",
+    "activeTab",
+    "tabs",
+    "scripting"
+  ],
+  "host_permissions": [
+    "https://mail.google.com/*",
+    "https://www.googleapis.com/gmail/v1/users/*"
+  ],
+  "oauth2": {
+    "client_id": "660240160139-1kug8ulkp5ccpi7uf61tjlqbjk580ig1.apps.googleusercontent.com",
+    "scopes": [
+      "https://www.googleapis.com/auth/gmail.readonly"
+    ]
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icon16.png",
+      "48": "icon48.png",
+      "128": "icon128.png"
+    }
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://mail.google.com/*"],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "web_accessible_resources": [
+    {
+      "resources": ["images/*.png", "images/*.svg", "images/*.gif", "sign-up.html"],
+      "matches": ["https://mail.google.com/*"]
+    }
+  ],
+  "content_security_policy": {
+    "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'self'"
+  }
+}
