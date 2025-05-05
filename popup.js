@@ -1,6 +1,37 @@
 let token = null;
 let scanResults = [];
 
+// BetterStack logging:
+function logEvent(eventType, message, additionalData = {}) {
+  const timestampCDT = new Date().toLocaleString('en-US', { timeZone: 'America/Chicago' });
+  const logData = {
+    dt: timestampCDT,
+    message: message,
+    eventType: eventType,
+    ...additionalData             
+  };
+
+  fetch('https://s1295227.eu-nbg-2.betterstackdata.com', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer wEbuDnATxe7BDzve3X6DZkEJ',
+    },
+    body: JSON.stringify(logData),
+  })
+  .then(response => {
+    if (!response.ok) {
+      console.error('Failed to log event to Better Stack:', response.statusText);
+    } else {
+      console.log('Log sent successfully:', logData);
+    }
+  })
+  .catch(error => {
+    console.error('Error sending log:', error);
+  });
+}
+
+
 const connectBtn = document.getElementById("connect-btn");
 const scanBtn = document.getElementById("scan-btn");
 const statusEl = document.getElementById("status");
@@ -41,6 +72,7 @@ function connectGmail() {
     token = accessToken;
     updateUI(true);
     statusEl.textContent = "Connected to Gmail!";
+    logEvent('gmail_connection', 'Gmail account connected');
   });
 }
 
@@ -65,6 +97,23 @@ async function scanInbox() {
 
     displayResults(results);
     statusEl.textContent = `Scan complete! Found ${results.length} messages.`;
+    
+    const suspiciousCount = scanResults.filter(r => r.status !== 'Safe').length;
+    const safeCount = scanResults.length - suspiciousCount;
+
+    const phishingResults = scanResults.filter(r => r.status !== 'Safe');
+
+    logEvent('scan_results', 'Scan completed', {
+      summary: {
+        total: scanResults.length,
+        safe: safeCount,
+        suspicious: suspiciousCount,
+        suspiciousSubjects: scanResults
+          .filter(r => r.status !== 'Safe')
+          .map(r => r.subject),
+      },
+      result: phishingResults
+    });
 
     const phishingEmails = results.filter(email => email.status === "Phishing");
     localStorage.setItem('phishingEmails', JSON.stringify(phishingEmails));    
@@ -161,9 +210,9 @@ function displayResults(results) {
 
   setTimeout(() => {
     if (feedbackBtn) {
-      feedbackBtn.disabled = false; // Enable the feedback button
-      feedbackBtn.classList.remove("disabled"); // Remove any visual disabled class if there is one
-      feedbackBtn.offsetHeight;  // Force reflow
+      feedbackBtn.disabled = false; // enable feedback button
+      feedbackBtn.classList.remove("disabled");
+      feedbackBtn.offsetHeight;  // force reflow
       console.log('Feedback button enabled');
     }
   }, 0);
