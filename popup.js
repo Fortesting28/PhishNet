@@ -31,7 +31,6 @@ function logEvent(eventType, message, additionalData = {}) {
   });
 }
 
-
 const connectBtn = document.getElementById("connect-btn");
 const scanBtn = document.getElementById("scan-btn");
 const statusEl = document.getElementById("status");
@@ -41,6 +40,12 @@ const newUserLink = document.getElementById("new-user-link");
 const feedbackBtn = document.getElementById("feedback-btn");
 
 document.addEventListener("DOMContentLoaded", () => {
+  // check login state
+  chrome.storage.local.get("isLoggedIn", ({ isLoggedIn }) => {
+    newUserLink.textContent = isLoggedIn ? "Log Out" : "New Users: Sign in here";
+  });
+
+  // see if gmail token exists
   chrome.identity.getAuthToken({ interactive: false }, (existingToken) => {
     if (existingToken) {
       token = existingToken;
@@ -54,21 +59,48 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if (feedbackBtn) {
     feedbackBtn.addEventListener("click", () => {
-      chrome.tabs.create({ url: chrome.runtime.getURL("feedback.html") });
+      chrome.tabs.create({
+        url: chrome.runtime.getURL("feedback.html")
+      });
     });
   }
+
+  // sign in or log out logic
+  newUserLink.addEventListener("click", (e) => {
+    e.preventDefault();
+
+    chrome.storage.local.get("isLoggedIn", ({ isLoggedIn }) => {
+      if (isLoggedIn) {
+        // log out logiv
+        chrome.storage.local.remove("isLoggedIn");
+        if (token) {
+          chrome.identity.removeCachedAuthToken({ token }, () => {
+            token = null;
+            updateUI(false);
+            window.close(); // next click shows welcome screen
+          });
+        } else {
+          window.close();
+        }
+      } else {
+        // sign in
+        chrome.tabs.create({
+          url: chrome.runtime.getURL("mfa/index.html")
+        });
+        window.close();
+      }
+    });
+  });
 });
 
 function connectGmail() {
   statusEl.textContent = "Connecting to Gmail...";
-  
   chrome.identity.getAuthToken({ interactive: true }, (accessToken) => {
     if (chrome.runtime.lastError) {
       statusEl.textContent = "Connection failed. Please try again.";
       console.error("Auth error:", chrome.runtime.lastError);
       return;
     }
-    
     token = accessToken;
     updateUI(true);
     statusEl.textContent = "Connected to Gmail!";
@@ -93,8 +125,6 @@ async function scanInbox() {
     }
 
     const results = await analyzeMessages(messages);
-    console.log(results);
-
     displayResults(results);
     statusEl.textContent = `Scan complete! Found ${results.length} messages.`;
     
@@ -116,9 +146,8 @@ async function scanInbox() {
     });
 
     const phishingEmails = results.filter(email => email.status === "Phishing");
-    localStorage.setItem('phishingEmails', JSON.stringify(phishingEmails));    
+    localStorage.setItem('phishingEmails', JSON.stringify(phishingEmails));
     feedbackBtn.disabled = phishingEmails.length === 0;
-
   } catch (error) {
     console.error("Scan failed:", error);
     statusEl.textContent = "Scan failed. Please try again.";
@@ -141,7 +170,7 @@ async function fetchGmailMessages(accessToken) {
     const { messages } = await listResponse.json();
     if (!messages || !messages.length) return [];
 
-    const messagePromises = messages.map(msg => 
+    const messagePromises = messages.map(msg =>
       fetch(`https://www.googleapis.com/gmail/v1/users/me/messages/${msg.id}`, {
         headers: { Authorization: `Bearer ${accessToken}` }
       }).then(res => res.json())
@@ -156,12 +185,12 @@ async function fetchGmailMessages(accessToken) {
 
 async function analyzeMessages(messages) {
   const results = [];
-  
+
   for (const [index, message] of messages.entries()) {
     try {
       const subject = message.payload.headers.find(h => h.name === "Subject")?.value || "No Subject";
       const content = message.snippet || "";
-      
+
       statusEl.textContent = `Analyzing ${index + 1}/${messages.length}: ${subject.substring(0, 30)}...`;
 
       const response = await fetch("https://phishnet-6beu.onrender.com/analyze", {
@@ -171,16 +200,16 @@ async function analyzeMessages(messages) {
       });
 
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
-      
       const result = await response.json();
+
       results.push({ subject, content, status: result.result, reasons: result.reasons });
     } catch (error) {
       console.error(`Failed to analyze message ${index}:`, error);
-      results.push({ 
-        subject: "Error", 
-        content: "", 
-        status: "Error", 
-        error: error.message 
+      results.push({
+        subject: "Error",
+        content: "",
+        status: "Error",
+        error: error.message
       });
     }
   }
@@ -190,7 +219,7 @@ async function analyzeMessages(messages) {
 
 function displayResults(results) {
   scanResults = results;
-  
+
   chrome.storage.local.set({ scanResults: results }, () => {
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
       if (tabs[0]?.url?.includes("mail.google.com")) {
@@ -210,9 +239,9 @@ function displayResults(results) {
 
   setTimeout(() => {
     if (feedbackBtn) {
-      feedbackBtn.disabled = false; // enable feedback button
-      feedbackBtn.classList.remove("disabled");
-      feedbackBtn.offsetHeight;  // force reflow
+      feedbackBtn.disabled = false; // Enable the feedback button
+      feedbackBtn.classList.remove("disabled"); // Remove any visual disabled class if there is one
+      feedbackBtn.offsetHeight;  // Force reflow
       console.log('Feedback button enabled');
     }
   }, 0);
@@ -227,30 +256,37 @@ function downloadPDF() {
   doc.setFont("helvetica");
   doc.setFontSize(18);
   doc.text("PhishNet Scan Report", 105, 15, { align: "center" });
-  
   doc.setFontSize(12);
   doc.text(`Generated on ${new Date().toLocaleString()}`, 105, 25, { align: "center" });
-  
+
   let yPos = 40;
-  scanResults.forEach((result, index) => {
+  scanResults.forEach((result) => {
     if (yPos > 250) {
       doc.addPage();
       yPos = 20;
     }
-    
+
     doc.setFontSize(14);
-    doc.setTextColor(result.status === "Phishing" ? 217 : 11, result.status === "Phishing" ? 48 : 128, result.status === "Phishing" ? 37 : 67);
-    doc.text(`${result.status === "Phishing" ? "🔴" : "🟢"} ${result.subject.substring(0, 60)}`, 20, yPos);
-    
+    doc.setTextColor(
+      result.status === "Phishing" ? 217 : 11,
+      result.status === "Phishing" ? 48 : 128,
+      result.status === "Phishing" ? 37 : 67
+    );
+    doc.text(
+      `${result.status === "Phishing" ? "🔴" : "🟢"} ${result.subject.substring(0, 60)}`,
+      20,
+      yPos
+    );
+
     doc.setFontSize(10);
     doc.setTextColor(0, 0, 0);
     doc.text(`Status: ${result.status}`, 20, yPos + 7);
-    
+
     if (result.content) {
       const contentLines = doc.splitTextToSize(result.content.substring(0, 200), 170);
       doc.text(contentLines, 20, yPos + 15);
     }
-    
+
     yPos += result.content ? 30 : 20;
     doc.line(20, yPos, 190, yPos);
     yPos += 10;
@@ -269,7 +305,7 @@ function escapeHtml(unsafe) {
     .replace(/'/g, "&#039;");
 }
 
-// Update UI based on connection state
+// Update UI based on connection
 function updateUI(connected) {
   connectBtn.textContent = connected ? "Reconnect Gmail" : "Connect Gmail";
   scanBtn.disabled = !connected;
