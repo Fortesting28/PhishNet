@@ -138,14 +138,14 @@ document.addEventListener("DOMContentLoaded", function() {
     const phone = document.getElementById("signupPhone").value.trim();
     console.log("Phone entered:", phone);
     if (phone) {
-        if (isPhoneNumberValid(phone)) {
-            sendOtp(phone);
-        } else {
-            alert("Please enter a valid phone number.");
-        }
-        } else {
-            alert("No phone number provided. MFA is optional, but you must enter a valid phone if you want to use it.");
-        }
+      if (isPhoneNumberValid(phone)) {
+        sendOtp(phone);
+      } else {
+        alert("Please enter a valid phone number.");
+      }
+    } else {
+      alert("No phone number provided. MFA is optional, but you must enter a valid phone if you want to use it.");
+    }
   });
 
   // sign up form
@@ -164,60 +164,60 @@ document.addEventListener("DOMContentLoaded", function() {
 
     // ensures all fields are filled
     if (!name || !email || !password) {
-        alert("Please fill in all required fields.");
-        return;
+      alert("Please fill in all required fields.");
+      return;
     }
 
     // message if pw doesn't meet criteria
     if (!isPasswordValid(password)) {
-        alert("Password must be at least 8 characters long, include at least one uppercase letter, one number, and one symbol.");
-        return;
+      alert("Password must be at least 8 characters long, include at least one uppercase letter, one number, and one symbol.");
+      return;
     }
 
     if (phone) {
-        if (otpField.style.display === "block" && !isOtpVerified) {
-          console.log("OTP field visible, verifying OTP");
-          isOtpVerified = await verifyOtp(phone, otp);
-          if (!isOtpVerified) {
-            alert("Invalid OTP. Please try again.");
-            return;
-          }
-          alert("Phone number verified.");
-        } else {
-          console.log("OTP not required or already verified (phone provided).");
+      if (otpField.style.display === "block" && !isOtpVerified) {
+        console.log("OTP field visible, verifying OTP");
+        isOtpVerified = await verifyOtp(phone, otp);
+        if (!isOtpVerified) {
+          alert("Invalid OTP. Please try again.");
+          return;
         }
+        alert("Phone number verified.");
       } else {
-        // skip OTP if no phone is provided
-        console.log("No phone provided, skipping OTP.");
+        console.log("OTP not required or already verified (phone provided).");
       }
-  
-      // create new user in firebase
-      try {
-        console.log("Creating user with Firebase...");
-        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-        const user = userCredential.user;
-        console.log("User created:", user);
-  
-        // send verification email
-        await sendEmailVerification(user);
-        console.log("Verification email sent to:", user.email);
-  
-        // save data in firebase under user's UID
-        await setDoc(doc(db, "users", user.uid), {
-          name: name,
-          email: email,
-          phone: phone,  // store empty string if no phone
-          createdAt: new Date().toISOString()
-        });
-        console.log("User data saved to Firestore");
-  
-        // success or error message upon registering
-        alert(`User ${user.email} registered successfully! A verification email has been sent.`);
-      } catch (error) {
-        console.error("Error during signup:", error);
-        alert(`Error: ${error.message}`);
-      }
-    });
+    } else {
+      // skip OTP if no phone is provided
+      console.log("No phone provided, skipping OTP.");
+    }
+
+    // create new user in firebase
+    try {
+      console.log("Creating user with Firebase...");
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+      console.log("User created:", user);
+
+      // send verification email
+      await sendEmailVerification(user);
+      console.log("Verification email sent to:", user.email);
+
+      // save data in firebase under user's UID
+      await setDoc(doc(db, "users", user.uid), {
+        name: name,
+        email: email,
+        phone: phone,  // store empty string if no phone
+        createdAt: new Date().toISOString()
+      });
+      console.log("User data saved to Firestore");
+
+      // success or error message upon registering
+      alert(`User ${user.email} registered successfully! A verification email has been sent.`);
+    } catch (error) {
+      console.error("Error during signup:", error);
+      alert(`Error: ${error.message}`);
+    }
+  });
 
   // sign in form
   loginForm.addEventListener("submit", async (event) => {
@@ -242,6 +242,12 @@ document.addEventListener("DOMContentLoaded", function() {
 
       console.log("User signed in:", user);
       alert(`Welcome back, ${user.email}!`);
+
+      // mark user as logged in
+      chrome.storage.local.set({ isLoggedIn: true }, () => {
+        // close this tab
+        window.close();
+      });
     } catch (error) {
       console.error("Login failed:", error);
       alert(`Login failed: ${error.message}`);
@@ -276,14 +282,14 @@ document.addEventListener("DOMContentLoaded", function() {
 
     // get email address from modal
     const email = document.getElementById("modalEmail").value.trim();
-    
+
     // ensure email is filled
     if (!email) {
       alert("Email is required.");
       return;
     }
     try {
-        // send password reset email
+      // send password reset email
       console.log("Sending password reset email to:", email);
       await sendPasswordResetEmail(auth, email);
       alert("Check email for password reset instructions.");
