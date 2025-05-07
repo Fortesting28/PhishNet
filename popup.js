@@ -31,6 +31,24 @@ function logEvent(eventType, message, additionalData = {}) {
   });
 }
 
+async function applyCorrections(results) {
+  return new Promise((resolve) => {
+    chrome.storage.local.get("corrections", (data) => {
+      const corrections = data.corrections || {};
+
+      const corrected = results.map(email => {
+        const correctedStatus = corrections[email.id]; // Make sure email.id exists
+        if (correctedStatus) {
+          return { ...email, status: correctedStatus };
+        }
+        return email;
+      });
+
+      resolve(corrected);
+    });
+  });
+}
+
 const connectBtn = document.getElementById("connect-btn");
 const scanBtn = document.getElementById("scan-btn");
 const statusEl = document.getElementById("status");
@@ -125,7 +143,9 @@ async function scanInbox() {
     }
 
     const results = await analyzeMessages(messages);
-    displayResults(results);
+    const correctedResults = await applyCorrections(results);
+
+    displayResults(correctedResults);
     statusEl.textContent = `Scan complete! Found ${results.length} messages.`;
     
     const suspiciousCount = scanResults.filter(r => r.status !== 'Safe').length;
@@ -186,10 +206,15 @@ async function fetchGmailMessages(accessToken) {
 async function analyzeMessages(messages) {
   const results = [];
 
+  const corrections = await new Promise(resolve => {
+    chrome.storage.local.get("corrections", data => resolve(data.corrections || {}));
+  });
+
   for (const [index, message] of messages.entries()) {
     try {
       const subject = message.payload.headers.find(h => h.name === "Subject")?.value || "No Subject";
       const content = message.snippet || "";
+      const id = message.id;
 
       statusEl.textContent = `Analyzing ${index + 1}/${messages.length}: ${subject.substring(0, 30)}...`;
 
@@ -202,7 +227,9 @@ async function analyzeMessages(messages) {
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
       const result = await response.json();
 
-      results.push({ subject, content, status: result.result, reasons: result.reasons });
+      const correctedStatus = corrections[id] === "safe" ? "Safe" : result.result;
+
+      results.push({ id, subject, content, status: result.result, reasons: result.reasons });
     } catch (error) {
       console.error(`Failed to analyze message ${index}:`, error);
       results.push({
