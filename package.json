@@ -4,7 +4,7 @@
     "cors": "^2.8.5",
     "dotenv": "^16.5.0",
     "express": "^4.21.2",
-    "twilio": "^5.4.0"
+    "twilio": "^5.6.0"
   },
   "name": "phishnet",
   "version": "1.0.0",
